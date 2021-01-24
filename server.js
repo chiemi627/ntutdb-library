@@ -46,10 +46,11 @@ app.get("/borrowing", (request, response) =>{
 
 app.post("/getBorrowingBooks", (request,response) =>{
   //課題：queryに適切なSQL文を入れましょう
-  const query = ""
+  const query = "?";
   bookdb.all(query, request.body.userid, (error,rows) =>{
     if(error){
       console.log(error);
+      response.send({status: "ERROR",message: "問い合わせが間違っているようです。"+error})
     }
     else{
       response.send(JSON.stringify(rows));      
@@ -60,7 +61,7 @@ app.post("/getBorrowingBooks", (request,response) =>{
 app.get("/lend", (request, response) => {
   console.log("lend");
   var query = `SELECT * FROM book WHERE bookid = ?`
-  bookdb.all(query, request.query.bookid, (err, rows) => {
+  bookdb.all(query, [request.query.bookid], (err, rows) => {
     response.render("lend.ejs",rows[0]);
   });
 });
@@ -70,11 +71,11 @@ app.post("/lendBook", (request, response) =>{
   const bookid = request.body.bookid
   const now = new Date();
   const today = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}` 
-  const query = "";
+  const query = "?,?,?";
   bookdb.run(query,[userid,bookid,today],error=>{
     if (error) {          
       console.log("ERROR"+error);
-      response.send({ status: "ERROR", message: "借りられませんでした。他の人に借りられたかもしれません。蔵書リストをご確認ください。" });
+      response.send({ status: "ERROR", message: "借りられませんでした。エラーメッセージをご確認ください。 " });
     } else {
       console.log("SUCCESS");
       response.send({ status: "SUCCESS", message: "貸し出し完了しました。1週間以内にお返しください。" });
