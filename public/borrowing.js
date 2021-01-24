@@ -14,9 +14,14 @@ fetch("/getBorrowingBooks", {
 })
   .then(res => res.json())
   .then(response => {
-    response.forEach(row => {
-      appendNewBook(row);
-    });
+    if(!Array.isArray(response)){
+      message.innerText = response.message;
+    }
+    else{
+      response.forEach(row => {
+        appendNewBook(row);
+      });      
+    }
   });
 
 // a helper function that creates a list item for a given dream
